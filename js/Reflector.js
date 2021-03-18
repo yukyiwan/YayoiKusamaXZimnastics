@@ -44,7 +44,7 @@ THREE.Reflector = function ( geometry, options ) {
 		stencilBuffer: false
 	};
 
-	var renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
+	var renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight);
 
 	if ( ! THREE.Math.isPowerOfTwo( textureWidth ) || ! THREE.Math.isPowerOfTwo( textureHeight ) ) {
 
@@ -161,7 +161,8 @@ THREE.Reflector = function ( geometry, options ) {
 		renderer.vr.enabled = false; // Avoid camera modification and recursion
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
-		renderer.render( scene, virtualCamera, renderTarget, true );
+		renderer.setRenderTarget( renderTarget );
+		renderer.render( scene, virtualCamera );
 
 		renderer.vr.enabled = currentVrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
