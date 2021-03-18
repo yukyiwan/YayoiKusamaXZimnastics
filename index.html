@@ -1,0 +1,358 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>YayoiKusama X Zimnastics</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/Reflector.js"></script>
+    <script src="js/THREEx.WindowResize.js"></script>
+    <script src="js/THREEx.FullScreen.js"></script>
+    <script src="js/KeyboardState.js"></script>
+    <!-- <script src="js/d3-threeD.js"></script> -->
+
+    <!-- linked the BSP library -->
+    <script src="https://johnson2heng.github.io/three.js-demo/lib/threebsp.js"></script>
+
+    <script>
+    window.addEventListener("DOMContentLoaded", () => {
+
+        // SCENE
+        const scene = new THREE.Scene();
+
+        // CAMERA
+        const viewAngle = 90;
+        const windowW = window.innerWidth;
+        const windowH = window.innerHeight;
+        const aspectRatio = windowW/windowH;
+        const near = .1;
+        const far = 1000;
+        const camera = new THREE.PerspectiveCamera(viewAngle, aspectRatio, near, far);
+        camera.position.z = 55; // back out of screen a little from origin (0,0,0)
+        // camera.lookAt(scene.position);
+
+        // RENDERER
+        const renderer = new THREE.WebGLRenderer({antialias:true});
+        renderer.setSize(windowW, windowH);
+        document.body.appendChild(renderer.domElement);
+
+        // EVENTS
+      THREEx.WindowResize(renderer, camera);
+      THREEx.FullScreen.bindKey({charCode : 'm'.charCodeAt(0)});
+        var keyboard = new KeyboardState();
+
+
+        // GEOMETRY--The big box (x, y, z)
+        const width = 120;
+        const height = 40;
+        const depth = 120;
+        const geometry = new THREE.BoxGeometry(width, height, depth);
+
+        // MATERIAL
+        const material = [];
+        // order to add materials: x+,x-,y+,y-,z+,z-
+        material.push(new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/bg-01.jpg'), side:THREE.DoubleSide}));
+        material.push(new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/bg-01.jpg'), side:THREE.DoubleSide}));
+        material.push(new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/bg-02.jpg'), side:THREE.DoubleSide}));
+        material.push(new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/bg-02.jpg'), side:THREE.DoubleSide}));
+        material.push(new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/bg-01.jpg'), side:THREE.DoubleSide}));
+        material.push(new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/bg-01.jpg'), side:THREE.DoubleSide}));
+
+        // MESH
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        // Bubbles
+        const bubbles = [];
+
+        const geometry2 = new THREE.SphereGeometry( 0.1, 32, 16 );
+        const material2 = new THREE.MeshStandardMaterial({
+            color: "black",
+            transparent: true,
+            opacity:.2,
+            roughness:0.2,
+            metalness:.8,
+            wireframeLinewidth:6.8,
+         });
+
+        for ( let i = 0; i < 500; i ++ ) {
+
+    const mesh = new THREE.Mesh( geometry2, material2 );
+
+            mesh.position.x = Math.random() * width - width/2;
+    mesh.position.y = Math.random() * height - height/2;
+    mesh.position.z = Math.random() * depth - depth/2;
+
+    mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
+
+    scene.add( mesh );
+    bubbles.push( mesh );
+  }
+
+        // create 3d logo text
+        let txtMesh;
+        const textLoad = new THREE.FontLoader().load('fonts/Gymnast_Regular.typeface.json',function(font){
+           const txtGeo = new THREE.TextGeometry('zimnastics',{
+                   font: font,
+                   size: 1.5, //default is 100
+                   height: 1, //depth of words. Default is 50. (字的深度)
+                   curveSegments: 12, //Number of points on the curves. Default is 12.（曲线控制点数）
+                   bevelEnabled: true, //Turn on bevel. Default is False.（斜角）
+                   bevelThickness: 0.1, //How deep into text bevel goes. Default is 10.（斜角的深度）
+                   bevelSize: 0.05, //How far from text outline is bevel. Default is 8.（斜角的大小）
+                　 bevelSegments: 3 //Number of bevel segments. Default is 3.（斜角段数）
+            }).center();
+
+            const txtMater = new THREE.MeshStandardMaterial({
+                color:"white",
+                roughness:0.1,
+                metalness:0.5,
+            });
+
+            txtMesh = new THREE.Mesh(txtGeo,txtMater);
+            txtMesh.position.set(0,2,1);
+            scene.add(txtMesh);
+        });
+
+
+        //create a group of 5 circles
+        let p01 = 4.5;
+        const s01 = 2.1;
+        const d01 = 0.5;
+        const group = new THREE.Group();
+  scene.add( group );
+
+        const circle01_geo = new THREE.TorusGeometry(1.8, 0.2, 8, 50 );
+        const circle01_mat = new THREE.MeshStandardMaterial( { color: 0xffba8e } );
+        const circle01 = new THREE.Mesh( circle01_geo, circle01_mat );
+        circle01.position.set(p01,-2,d01);
+        group.add(circle01);
+
+        const circle02_geo = new THREE.TorusGeometry(1.8, 0.2, 8, 50 );
+        const circle02_mat = new THREE.MeshStandardMaterial( { color: 0xb38fc4 } );
+        const circle02 = new THREE.Mesh( circle02_geo, circle02_mat );
+        circle02.position.set(p01-s01,-4,d01);
+        group.add(circle02);
+
+        const circle03_geo = new THREE.TorusGeometry(1.8, 0.2, 8, 50 );
+        const circle03_mat = new THREE.MeshStandardMaterial( { color: 0xfceb9e } );
+        const circle03 = new THREE.Mesh( circle03_geo, circle03_mat );
+        circle03.position.set(p01-s01*2,-2,d01);
+        group.add(circle03);
+
+        const circle04_geo = new THREE.TorusGeometry(1.8, 0.2, 8, 50 );
+        const circle04_mat = new THREE.MeshStandardMaterial( { color: 0x90fce6 } );
+        const circle04 = new THREE.Mesh( circle04_geo, circle04_mat );
+        circle04.position.set(p01-s01*3,-4,d01);
+        group.add(circle04);
+
+        const circle05_geo = new THREE.TorusGeometry(1.8, 0.2, 8, 50 );
+        const circle05_mat = new THREE.MeshStandardMaterial( { color: 0xff4b81 } );
+        const circle05 = new THREE.Mesh( circle05_geo, circle05_mat );
+        circle05.position.set(p01-s01*4,-2,d01);
+        group.add(circle05);
+
+        // create front wall
+        const wall_front_geo = new THREE.BoxGeometry(width/4, height, 1);
+        const wall_front_mat = new THREE.MeshStandardMaterial({color:0xe07fc1 });
+        const wall_front = new THREE.Mesh(wall_front_geo, wall_front_mat);
+        wall_front.position.set(0,0,15);
+
+        // create window
+        const window_geo = new THREE.BoxGeometry(10,6,1);
+        const window_mat = new THREE.MeshStandardMaterial({color:"yellow" });
+        const window1 = new THREE.Mesh(window_geo, window_mat);
+        window1.position.set(0,10,15);
+
+        // create special wall(having a window: front all - window)
+        //change wall and window to BSP objects
+        const bsp_wall_front = new ThreeBSP(wall_front);
+        const bsp_window = new ThreeBSP(window1);
+        //substract window from bsp_wall
+        const BSP = bsp_wall_front.subtract(bsp_window);
+        //get the geometry and material
+        const swall_geo = BSP.toMesh().geometry;
+        const swall_mat = new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/windowbg.jpg'), side:THREE.DoubleSide});
+        // create the special wall
+        const swall = new THREE.Mesh(swall_geo,swall_mat);
+        //add the special wall to scene
+        swall.position.set(0,0,15)
+        scene.add(swall);
+
+        //mirror front
+        let planeGeometry1 = new THREE.PlaneBufferGeometry((width/4+4)/2-4, height);
+        let options = {
+            clipBias: 0.02,
+            textureWidth: window.innerWidth * window.devicePixelRatio,
+            textureHeight: window.innerHeight * window.devicePixelRatio,
+            color: 0x889999,
+            recursion: 1
+        };
+        let mirrorF1 = new THREE.Reflector(planeGeometry1, options);
+        scene.add(mirrorF1);
+        mirrorF1.position.set(-(width/4+4)/4-2,0,17);
+
+        let mirrorF2 = new THREE.Reflector(planeGeometry1, options);
+        scene.add(mirrorF2);
+        mirrorF2.position.set((width/4+4)/4+2,0,17);
+
+        let planeGeometry2 = new THREE.PlaneBufferGeometry(10, height-13);
+        let mirrorF3 = new THREE.Reflector(planeGeometry2, options);
+        scene.add(mirrorF3);
+        mirrorF3.position.set(0,-6.5,17);
+
+        let planeGeometry3 = new THREE.PlaneBufferGeometry(10, 8);
+        let mirrorF4 = new THREE.Reflector(planeGeometry3, options);
+        scene.add(mirrorF4);
+        mirrorF4.position.set(0,16,17);
+
+        //create left wall
+        const wall_left_geo = new THREE.BoxGeometry(0, height, depth/4);
+        const wall_left_mat = new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/windowbg.jpg'), side:THREE.DoubleSide});
+        const wall_left = new THREE.Mesh(wall_left_geo, wall_left_mat);
+        wall_left.position.set(-15,0,0);
+        scene.add(wall_left);
+
+        // mirror left
+        // let planeGeometryL = new THREE.PlaneBufferGeometry(width/4+4, height);
+        let planeGeometry = new THREE.PlaneBufferGeometry(width/4+4, height);
+        let mirrorL = new THREE.Reflector(planeGeometry, options);
+        scene.add(mirrorL);
+        // mirrorL.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,0));
+        mirrorL.position.set(-17,0,0);
+        mirrorL.rotation.y = - Math.PI / 2 ;
+
+        //create right wall
+        const wall_right_geo = new THREE.BoxGeometry(1, height, depth/4);
+        const wall_right_mat = new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/windowbg.jpg'), side:THREE.DoubleSide});
+        const wall_right = new THREE.Mesh(wall_right_geo, wall_right_mat);
+        wall_right.position.set(15,0,0);
+        scene.add(wall_right);
+
+        // mirror right
+        let mirrorR = new THREE.Reflector(planeGeometry, options);
+        scene.add(mirrorR);
+        // mirrorL.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,0));
+        mirrorR.position.set(17,0,0);
+        mirrorR.rotation.y = Math.PI / 2 ;
+
+
+        //create back wall
+        const wall_back_geo = new THREE.BoxGeometry(width/4, height, 1);
+        const wall_back_mat = new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/windowbg.jpg'), side:THREE.DoubleSide});
+        const wall_back = new THREE.Mesh(wall_back_geo, wall_back_mat);
+        wall_back.position.set(0,0,-15);
+        scene.add(wall_back);
+
+        // mirror back
+        let mirrorB = new THREE.Reflector(planeGeometry, options);
+        scene.add(mirrorB);
+        // mirrorL.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,0));
+        mirrorB.position.set(0,0,-17);
+        mirrorB.rotation.y = Math.PI;
+
+        //create ceiling
+        const ceiling_geo = new THREE.BoxGeometry(width/4, 0.1, depth/4);
+        const ceiling_mat = new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/windowbg.jpg'), side:THREE.DoubleSide});
+        const ceiling = new THREE.Mesh(ceiling_geo, ceiling_mat);
+        ceiling.position.set(0,height/2,0);
+        scene.add(ceiling);
+
+        //create floor
+        const floor_geo = new THREE.BoxGeometry(width/4, 0.1, depth/4);
+        const floor_mat = new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load('images/windowbg.jpg'), side:THREE.DoubleSide});
+        const floor = new THREE.Mesh(floor_geo, floor_mat);
+        floor.position.set(0,-height/2,0);
+        scene.add(floor);
+
+        //stairs
+
+        let planeGeometrySF1 = new THREE.PlaneBufferGeometry(10,2.5);
+        let mirrorSF1 = new THREE.Reflector(planeGeometrySF1, options);
+        scene.add(mirrorSF1);
+        mirrorSF1.position.set(0,-height/2+2.5,22.5);
+
+        let mirrorSF2 = new THREE.Reflector(planeGeometrySF1, options);
+        scene.add(mirrorSF2);
+        mirrorSF2.position.set(0,-height/2+5,20);
+
+        let mirrorSF3 = new THREE.Reflector(planeGeometrySF1, options);
+        scene.add(mirrorSF3);
+        mirrorSF3.rotation.x = -Math.PI/2;
+        mirrorSF3.position.set(0,-height/2+5+1.25,20-1.25);
+
+        let mirrorSF4 = new THREE.Reflector(planeGeometrySF1, options);
+        scene.add(mirrorSF4);
+        mirrorSF4.position.set(0,-height/2+3.75,21.25);
+        mirrorSF4.rotation.x = -Math.PI/2;
+
+        let planeGeometryST = new THREE.PlaneBufferGeometry(2.5,5);
+        let mirrorSR1 = new THREE.Reflector(planeGeometryST, options);
+        scene.add(mirrorSR1);
+        mirrorSR1.position.set(5,-height/2+5-1.25,18.75);
+        mirrorSR1.rotation.y = Math.PI/2;
+
+        let planeGeometrySS = new THREE.PlaneBufferGeometry(2.5,2.5);
+        let mirrorSR2 = new THREE.Reflector(planeGeometrySS, options);
+        scene.add(mirrorSR2);
+        mirrorSR2.position.set(5,-height/2+2.5,21.25);
+        mirrorSR2.rotation.y = Math.PI/2;
+
+        let mirrorSL1 = new THREE.Reflector(planeGeometryST, options);
+        scene.add(mirrorSL1);
+        mirrorSL1.position.set(-5,-height/2+5-1.25,18.75);
+        mirrorSL1.rotation.y = -Math.PI/2;
+
+        let mirrorSL2 = new THREE.Reflector(planeGeometrySS, options);
+        scene.add(mirrorSL2);
+        mirrorSL2.position.set(-5,-height/2+2.5,21.25);
+        mirrorSL2.rotation.y = -Math.PI/2;
+
+        // LIGHT
+        var light = new THREE.PointLight(0xffffff);
+        light.position.set(100,250,100);
+        scene.add(light);
+
+        light = new THREE.PointLight(0xffffff);
+        light.position.set(-100,-250,-100);
+        scene.add(light);
+
+        light = new THREE.AmbientLight(0xffffff);
+        scene.add(light);
+
+        // CONTROLS
+        var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // ANIMATION
+        function render() {
+            // making bubbles floating
+            let speed = Math.random()* .05;
+            bubbles. forEach( bubble => {
+                bubble.position.y += speed;
+                if(bubble.position.y > height/2){
+                    bubble.position.y = -height/2;
+                }
+            });
+            // making the logo rotating
+            group.rotation.y += 0.005;
+            if (txtMesh)  txtMesh.rotation.y += 0.005;
+
+            renderer.setRenderTarget( null );
+            renderer.clear();
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        }
+        render();
+    });
+    </script>
+
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+    	body {margin:0px;}
+    	canvas {width:100%; height:100%}
+    </style>
+</head>
+<body>
+<audio controls loop src="sounds/Pistolero.mp3" style="display:none;" autoplay>
+</body>
+</html>
